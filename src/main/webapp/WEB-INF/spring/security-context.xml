@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans  xmlns="http://www.springframework.org/schema/beans"
+		xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+		xmlns:security="http://www.springframework.org/schema/security"
+		xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+							http://www.springframework.org/schema/security http://www.springframework.org/schema/security/spring-security.xsd">
+	
+	<!-- 로그인 및 권한설정 -->	
+	<security:http use-expressions="true">
+		<security:form-login />
+		<security:intercept-url pattern="/chat.htm" access="hasRole('ROLE_USER')"/>
+		<security:intercept-url pattern="/**" access="permitAll"/>
+		<security:logout logout-success-url="/index.htm" />
+	</security:http>
+	
+	
+	<security:authentication-manager>
+		<security:authentication-provider>
+			<security:jdbc-user-service data-source-ref="driverManagerDataSource"
+										users-by-username-query="SELECT USER_ID, PASSWORD, 1 ENABLED FROM CHATMEMBER WHERE USER_ID=?"
+										authorities-by-username-query="SELECT M.USER_ID, R.ROLE_NAME 
+																		FROM CHATMEMBER M JOIN ROLES R
+																		ON M.USER_ID = R.USER_ID
+																		WHERE M.USER_ID=?" />
+		</security:authentication-provider>
+	</security:authentication-manager>
+</beans>
